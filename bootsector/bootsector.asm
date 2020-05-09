@@ -1,5 +1,4 @@
-loop:
-  jmp loop
+jmp $ ; Infinite loop
 
 ; Padding with 0s until magic number
 TIMES 510-($-$$) db 0
