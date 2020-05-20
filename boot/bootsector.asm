@@ -31,7 +31,7 @@ load_kernel:
 
   ; bx contains where the data from disk should be loaded
   MOV bx, KERNEL_OFFSET ; Note: es is 0, thus es:bx is just bx
-  MOV dh, 1 ; Load 15 sectors to overshoot the size of our kernel
+  MOV dh, 15 ; Load 15 sectors to overshoot the size of our kernel
   MOV dl, [BOOT_DRIVE_INDEX] ; Load the boot drive index that we stored before
   CALL disk_load
 

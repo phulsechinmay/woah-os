@@ -1,23 +1,40 @@
-# BOOTSECTOR MAKES
-bootsector.bin: bootsector/bootsector.asm
-	cd bootsector && nasm -f bin bootsector.asm -o bootsector.bin
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h)
+# Nice syntax for file extension replacement
+OBJ = ${C_SOURCES:.c=.o}
 
-# KERNEL MAKES
-kernel.o: kernel/kernel.C
-	cd kernel && x86_64-elf-gcc -ffreestanding -c kernel.c -o kernel.o
+# Change this if your cross-compiler is somewhere else
+CC = x86_64-elf-gcc
+# -g: Use debugging symbols in gcc
+CFLAGS = -g
 
-kernel-entry.o: kernel/kernel-entry.asm
-	cd kernel && nasm kernel-entry.asm -f elf64 -o kernel-entry.o
+# First rule is run by default
+os-image.bin: boot/bootsector.bin kernel.bin
+	cat $^ > os-image.bin
 
-# kernel-entry.o should always be the first object file in the linked command
-kernel.bin: kernel-entry.o kernel.o
-	cd kernel && x86_64-elf-ld -o kernel.bin -Ttext 0x1000 kernel-entry.o kernel.o --oformat binary
+# '--oformat binary' deletes all symbols as a collateral, so we don't need
+# to 'strip' them manually on this case
+kernel.bin: kernel/kernel-entry.o ${OBJ}
+	x86_64-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
-os-image.bin: kernel.bin bootsector.bin
-	cat bootsector/bootsector.bin kernel/kernel.bin > os-image.bin
+# Used for debugging purposes
+kernel.elf: kernel/kernel-entry.o ${OBJ}
+	x86_64-elf-ld -o $@ -Ttext 0x1000 $^ 
 
 run: os-image.bin
-	qemu-system-x86_64 os-image.bin
+	qemu-system-x86_64 -fda os-image.bin
+
+# Generic rules for wildcards
+# To make an object, always compile from its .c
+%.o: %.c ${HEADERS}
+	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
+
+%.o: %.asm
+	nasm $< -f elf -o $@
+
+%.bin: %.asm
+	nasm $< -f bin -o $@
 
 clean:
-	rm *.o *.bin
+	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
