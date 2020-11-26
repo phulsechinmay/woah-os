@@ -1,7 +1,8 @@
+#include "../drivers/screen.h"
+
 int print_to_terminal() {
-  char* video_memory = (char*)0xb8000;
-  // Just write a simple 'H' to the terminal
-  *video_memory = 'H';
+  print_char('D', 0, 0, 0x0f);
+  print_char('D', 0, 1, 0x0f);
 }
 
 void main() {

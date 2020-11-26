@@ -17,12 +17,12 @@
 
   CALL switch_to_protected_mode
 
-%include "bios-level-functions/bootsector-disk.asm"
-%include "bios-level-functions/bootsector-hex-print-func.asm"
-%include "bios-level-functions/bootsector-print-func.asm"
-%include "protected-mode-gdt.asm"
-%include "protected-mode-print.asm"
-%include "protected-mode-switch.asm"
+%include "boot/bios-level-functions/bootsector-disk.asm"
+%include "boot/bios-level-functions/bootsector-hex-print-func.asm"
+%include "boot/bios-level-functions/bootsector-print-func.asm"
+%include "boot/protected-mode-gdt.asm"
+%include "boot/protected-mode-print.asm"
+%include "boot/protected-mode-switch.asm"
 
 [bits 16]
 load_kernel:

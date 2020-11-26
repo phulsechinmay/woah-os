@@ -30,7 +30,7 @@ run: os-image.bin
 	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
 
 %.o: %.asm
-	nasm $< -f elf -o $@
+	nasm $< -f elf64 -o $@
 
 %.bin: %.asm
 	nasm $< -f bin -o $@
